@@ -46,7 +46,7 @@ int main (int argc, char * argv[]){
 		errexit("WSAStartup failed\n");
 	client (host, port1) ;
 	WSACleanup ();
-	printf("\033[34mï¿½Ë³ï¿½ï¿½ï¿½ï¿½ï¿½...\n\033[0m");
+	printf("\033[34mÍË³ö³ÌÐò...\n\033[0m");
 	return 0;
 }
 
