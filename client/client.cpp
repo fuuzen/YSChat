@@ -53,15 +53,15 @@ int main (int argc, char * argv[]){
 
 void client (const char * host, const char * service){
 	SOCKET s;
-	printf("\033[34mï¿½ï¿½Ó­ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ½Ì¨~\033[0m\n");
+	printf("\033»¶Ó­À´µ½ YSChat Æ½Ì¨~\033[0m\n");
 	s = connectTCP (host, service);
 	char loginState = 0;
 	unsigned long long l_username, l_password;
 	string username, password;
 	while(!loginState){
-		printf("\033[34mï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½:\033[0m\n");
+		printf("\033[34mÇëÊäÈëÓÃ»§Ãû:\033[0m\n");
 		getline(cin, username);
-		printf("\033[34mï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½:\033[0m\n");
+		printf("\033[34mÇëÊäÈëÃÜÂë:\033[0m\n");
 		getline(cin, password);
 		l_username = sizeof(username);
 		send(s, (char*)&l_username, 8, 0);
@@ -70,9 +70,9 @@ void client (const char * host, const char * service){
 		send(s, (char*)&l_password, 8, 0);
 		send(s, password.c_str(), l_password, 0);
 		if(reveiceAndCheck(s, (char *)&loginState, 1))return;
-		if(!loginState) printf("\033[31mï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½!\033[0m\n");
+		if(!loginState) printf("\033[31mÓÃ»§Ãû»òÃÜÂë´íÎó!\033[0m\n");
 	}
-	printf("\033[34mï¿½ï¿½Â¼ï¿½É¹ï¿½~ [Ctrl + C]ï¿½Ë³ï¿½ï¿½ï¿½ï¿½ï¿½...\033[0m\n");
+	printf("\033[34mµÇÂ½³É¹¦~ [Ctrl + C]ÍË³ö³ÌĞò...\033[0m\n");
 	thread r(receiveMessage, s);
 	unsigned long long l;
 	string input;

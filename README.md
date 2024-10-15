@@ -21,3 +21,5 @@ g++ -std=c++20 client.cpp -lws2_32 -o client
 # host 指定服务端运行的主机名或 ip
 # port1 port2 同上
 ```
+
+注意  Windows 需要使用 GBK 编码打开和保存源文件，才能保证编译出来的程序能输出中文
