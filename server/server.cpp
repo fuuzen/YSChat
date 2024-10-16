@@ -15,14 +15,13 @@ using namespace std;
 # define QLEN  5
 # define WSVERS  MAKEWORD (2, 0)
 
-void server (SOCKET, unordered_map<string, string> &);
+void server (SOCKET, SOCKET, unordered_map<string, string> &);
 SOCKET passiveTCP (const char *, int);
 void errexit (const char * format, ...);
 void broadCast(SOCKET, char *, unsigned long long, string user);
 bool reveiceAndCheck(SOCKET, char *, unsigned long long, string);
 
-char * port1 = "11451";      /* send mseeage to this port */
-char * port2 = "14514";      /* receive mseeage from this port */
+char * port = "11451";         /* port */
 char * filename = "users.db";  /* 不是 sqlite 只是文本存储数据（反正只是读数据）*/
 vector<SOCKET> slaves;
 
@@ -36,15 +35,13 @@ int main (int argc, char * argv []) {
 	switch (argc) {
 	case 1:
 		break;
-	case 4:
-		port2 = argv[3];
 	case 3:
-		port1 = argv[2];
+		port = argv[2];
 	case 2:
 		strcpy(filename, argv[1]);
 		break;
 	default:
-		errexit("usage: server.exe [filename [port1] [port2]]\n");
+		errexit("usage: server.exe [filename [port]]\n");
 	}
 
 	ifstream file("users.db");
@@ -60,7 +57,7 @@ int main (int argc, char * argv []) {
 	if (WSAStartup (WSVERS, &wsadata) != 0)
 		errexit("WSAStartup failed\n");
 
-	msock = passiveTCP(port1, QLEN);
+	msock = passiveTCP(port, QLEN);
 
 	while (1) {
 		alen = sizeof (struct sockaddr);

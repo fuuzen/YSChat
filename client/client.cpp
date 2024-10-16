@@ -21,9 +21,8 @@ atomic<bool> receiving(true);
 condition_variable cv;
 mutex mtx;
 
-char * host = "127.0.0.1";   /* host to use if none supplied */
-char * port1 = "11451";      /* send mseeage to this port */
-char * port2 = "14514";      /* receive mseeage from this port */
+char * host = "127.0.0.1";  /* host to use if none supplied */
+char * port = "11451";      /* port */
 
 
 int main (int argc, char * argv[]){
@@ -31,37 +30,35 @@ int main (int argc, char * argv[]){
 	switch (argc) {
 		case 1:
 			break;
-		case 4:
-			port2 = argv[3];
 		case 3:
-			port1 = argv[2];
+			port = argv[2];
 		case 2:
 			host = argv[1];
 			break;
 		default:
-			errexit("usage: client.exe [host [port1] [port2]]\n");
+			errexit("usage: client.exe [host [port]]\n");
 	}
 
 	if (WSAStartup (WSVERS, &wsadata) != 0)
 		errexit("WSAStartup failed\n");
-	client (host, port1) ;
+	client (host, port) ;
 	WSACleanup ();
-	printf("\033[34m退出程序...\n\033[0m");
+	printf("\033[36m退出程序...\n\033[0m");
 	return 0;
 }
 
 
 void client (const char * host, const char * service){
 	SOCKET s;
-	printf("\033欢迎来到 YSChat 平台~\033[0m\n");
+	printf("\033[36m欢迎来到 \033[33mYSChat\033[36m 平台~\033[0m\n");
 	s = connectTCP (host, service);
 	char loginState = 0;
 	unsigned long long l_username, l_password;
 	string username, password;
 	while(!loginState){
-		printf("\033[34m请输入用户名:\033[0m\n");
+		printf("\033[36m请输入用户名:\033[0m\n");
 		getline(cin, username);
-		printf("\033[34m请输入密码:\033[0m\n");
+		printf("\033[36m请输入密码:\033[0m\n");
 		getline(cin, password);
 		l_username = sizeof(username);
 		send(s, (char*)&l_username, 8, 0);
@@ -72,7 +69,7 @@ void client (const char * host, const char * service){
 		if(reveiceAndCheck(s, (char *)&loginState, 1))return;
 		if(!loginState) printf("\033[31m用户名或密码错误!\033[0m\n");
 	}
-	printf("\033[34m登陆成功~ [Ctrl + C]退出程序...\033[0m\n");
+	printf("\033[36m登陆成功~ 输入[exit]退出程序...\033[0m\n");
 	thread r(receiveMessage, s);
 	unsigned long long l;
 	string input;
@@ -82,12 +79,13 @@ void client (const char * host, const char * service){
 		l = input.size();
 		send(s, (char *)&l, 8, 0);
 		send(s, input.c_str(), input.size(), 0);
-    }
-	lock_guard<mutex> lock(mtx);
-	receiving = false;
+    }{
+		lock_guard<mutex> lock(mtx);
+		receiving = false;
+	}
 	cv.notify_all();
-	r.join();
 	closesocket (s);
+	r.join();
 }
 
 
@@ -95,8 +93,10 @@ void receiveMessage(SOCKET s){
 	unsigned long long l, l_user;
 	string input;
 	while (1) {
-		unique_lock<mutex> lock(mtx);
-		if (!receiving) break;
+		{
+			unique_lock<mutex> lock(mtx);
+			if (!receiving) break;
+		}
 		if(reveiceAndCheck(s, (char *)&l, 8))return;
 		char user[l_user];
 		if(reveiceAndCheck(s, user, l))return;
